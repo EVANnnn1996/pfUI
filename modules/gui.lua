@@ -2276,12 +2276,16 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         CreateConfig(U[c], T["Buff Size"], C.unitframes[c], "buffsize")
         CreateConfig(U[c], T["Buff Limit"], C.unitframes[c], "bufflimit")
         CreateConfig(U[c], T["Buffs Per Row"], C.unitframes[c], "buffperrow")
+        CreateConfig(U[c], T["Buff X Offset"], C.unitframes[c], "buffoffx")
+        CreateConfig(U[c], T["Buff Y Offset"], C.unitframes[c], "buffoffy")
 
         CreateConfig(U[c], T["Debuffs"], nil, nil, "header")
         CreateConfig(U[c], T["Debuff Position"], C.unitframes[c], "debuffs", "dropdown", pfUI.gui.dropdowns.uf_buff_position)
         CreateConfig(U[c], T["Debuff Size"], C.unitframes[c], "debuffsize")
         CreateConfig(U[c], T["Debuff Limit"], C.unitframes[c], "debufflimit")
         CreateConfig(U[c], T["Debuffs Per Row"], C.unitframes[c], "debuffperrow")
+        CreateConfig(U[c], T["Debuff X Offset"], C.unitframes[c], "debuffoffx")
+        CreateConfig(U[c], T["Debuff Y Offset"], C.unitframes[c], "debuffoffy")
 
         if c ~= "player" then
           CreateConfig(U[c], T["Only Show Own Debuffs (|cffffaaaaExperimental|r)"], C.unitframes[c], "selfdebuff", "checkbox")
