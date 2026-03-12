@@ -17,7 +17,7 @@ pfUI:RegisterModule("unitxp", "vanilla", function ()
     local slot = h / 3  -- divide frame into thirds
 
     -- Behind Indicator for all units (MIDDLE)
-    if C.unitframes.behind_indicator == "1" and not pfUI.uf.target.behindIndicator then
+    if C.unitframes.behind_indicator == "1" and not pfUI.uf.target.behindIndicator and not C.unitframes.behind_hook_portrait == "1" then
       local behindFrame = CreateFrame("Frame", "pfBehindIndicator", pfUI.uf.target)
       behindFrame:SetAllPoints(pfUI.uf.target)
       behindFrame:SetFrameLevel(pfUI.uf.target:GetFrameLevel() + 10)
@@ -201,7 +201,16 @@ pfUI:RegisterModule("unitxp", "vanilla", function ()
             end
 
             f.text:SetTextColor(r, g, b, 1)
-            f.text:SetText(string.format("%.1f yd", distance))
+            if C.unitframes.behind_indicator == "1" and C.unitframes.behind_hook_portrait == "1" then
+              local successB, behind = pcall(UnitXP, "behind", "player", "target")
+              if successB and behind == false then
+                f.text:SetText(string.format("%.1f yd Front", distance))
+              else
+                f.text:SetText(string.format("%.1f yd Behind", distance))
+              end
+            else
+              f.text:SetText(string.format("%.1f yd", distance))
+            end
           end)
         end
         pfUI.uf.target.distanceIndicator = pfRangeDisplay
