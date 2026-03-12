@@ -201,13 +201,14 @@ pfUI:RegisterModule("unitxp", "vanilla", function ()
             end
 
             f.text:SetTextColor(r, g, b, 1)
-            if C.unitframes.behind_indicator == "1" and C.unitframes.behind_hook_portrait == "1" then
+            if C.unitframes.behind_indicator == "1" and C.unitframes.behind_hook_portrait == "0" then
               local successB, behind = pcall(UnitXP, "behind", "player", "target")
               if successB and behind == false then
                 f.text:SetText(string.format("%.1f yd Front", distance))
               else
                 f.text:SetText(string.format("%.1f yd Behind", distance))
               end
+              f:SetWidth(120)
             else
               f.text:SetText(string.format("%.1f yd", distance))
             end
