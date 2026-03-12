@@ -945,6 +945,13 @@ function pfUI.uf:UpdateConfig()
   f.happinessIcon.texture:SetVertexColor(1, 1, 0, 1)
   f.happinessIcon:Hide()
 
+  f.classIcon:SetWidth(tonumber(f.config.classiconsize))
+  f.classIcon:SetHeight(tonumber(f.config.classiconsize))
+  f.classIcon:SetPoint("CENTER", f, "CENTER", tonumber(f.config.classiconoffx),  tonumber(f.config.classiconoffy))
+  f.classIcon:SetFrameLevel(5)
+  f.classIcon.texture:SetAllPoints(f.classIcon)
+  f.classIcon:Hide()
+
   if f.config.buffs == "off" then
     for i=1, 32 do
       if f.buffs and f.buffs[i] then
@@ -1941,6 +1948,9 @@ function pfUI.uf:CreateUnitFrame(unit, id, config, tick)
   f.happinessIcon = CreateFrame("Frame", nil, f.hp.bar)
   f.happinessIcon.texture = f.happinessIcon:CreateTexture(nil, "BACKGROUND")
 
+  f.classIcon = CreateFrame("Frame", nil, f.hp.bar)
+  f.classIcon.texture = f.classIcon:CreateTexture(nil, "BACKGROUND")
+
   f.portrait = CreateFrame("Frame", "pfPortrait" .. f.label .. f.id, f)
   f.portrait.tex = f.portrait:CreateTexture("pfPortraitTexture" .. f.label .. f.id, "OVERLAY")
   f.portrait.model = CreateFrame("PlayerModel", "pfPortraitModel" .. f.label .. f.id, f.portrait)
@@ -2098,6 +2108,32 @@ function pfUI.uf:RefreshIndicators(unit)
     else
       unit.raidIcon:Hide()
     end
+  end
+
+  if unit.classIcon then
+    if unit.config.showclassicon == "1" and UnitExists(unitstr) and UnitIsPlayer(unitstr) then
+      local _, class = UnitClass(unitstr)
+      if class then
+        unit.classIcon.texture:SetTexture("Interface\\AddOns\\pfUI\\img\\ToxiClasses")
+        local classCoords = {
+          ["WARRIOR"] = {0.000, 0.122, 0.000, 0.123},
+          ["MAGE"]    = {0.125, 0.247, 0.000, 0.123},
+          ["ROGUE"]   = {0.250, 0.372, 0.000, 0.123},
+          ["DRUID"]   = {0.375, 0.497, 0.000, 0.123},
+          ["HUNTER"]  = {0.000, 0.122, 0.125, 0.248},
+          ["SHAMAN"]  = {0.125, 0.247, 0.125, 0.248},
+          ["PRIEST"]  = {0.250, 0.372, 0.125, 0.248},
+          ["WARLOCK"] = {0.373, 0.504, 0.121, 0.238},
+          ["PALADIN"] = {0.000, 0.122, 0.250, 0.373}
+        }
+        unit.classIcon.texture:SetTexCoord(unpack(classCoords[class]))
+      end
+      unit.classIcon:Show()
+    else
+      unit.classIcon:Hide()
+    end
+  else
+    unit.classIcon:Hide()
   end
 end
 

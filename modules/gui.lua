@@ -2215,6 +2215,11 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         CreateConfig(U[c], T["Heal Color"], C.unitframes[c], "healcolor", "color")
         CreateConfig(U[c], T["Display Overheal"], C.unitframes[c], "overhealperc", "dropdown", pfUI.gui.dropdowns.uf_overheal)
 
+        CreateConfig(U[c], T["Show Class Icon"], C.unitframes[c], "showclassicon", "checkbox")
+        CreateConfig(U[c], T["Class Icon Size"], C.unitframes[c], "classiconsize")
+        CreateConfig(U[c], T["Class Icon X Offset"], C.unitframes[c], "classiconoffx")
+        CreateConfig(U[c], T["Class Icon Y Offset"], C.unitframes[c], "classiconoffy")
+
         if c == "raid" then
           CreateConfig(U["raid"], T["Display Raid Group Label"], C.unitframes[c], "raidgrouplabel", "checkbox")
           CreateConfig(U["raid"], T["Group Label X-Offset"], C.unitframes[c], "grouplabelxoff")
