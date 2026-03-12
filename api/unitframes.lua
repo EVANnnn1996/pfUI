@@ -719,11 +719,13 @@ function pfUI.uf:UpdateConfig()
   f.power:SetPoint(f.config.panchor, f.hp, relative_point, f.config.poffx, -2 * default_border - spacing + f.config.poffy * GetPerfectPixel())
   f.power:SetWidth((f.config.pwidth ~= "-1" and f.config.pwidth or f.config.width))
   f.power:SetHeight(f.config.pheight)
+  f.power:SetFrameLevel(f.hp:GetFrameLevel() + 3)
   if tonumber(f.config.pheight) < 0 then f.power:Hide() end
 
   pfUI.api.CreateBackdrop(f.power, default_border)
   f.power.bar:SetStatusBarTexture(pfUI.media[f.config.pbartexture])
   f.power.bar:SetAllPoints(f.power)
+  f.power.bar:SetFrameLevel(f.hp:GetFrameLevel() + 4)
 
   local custompbg = f.config.defcolor == "0" and f.config.custompbg or C.unitframes.custompbg
   local custompbgcolor = f.config.defcolor == "0" and f.config.custompbgcolor or C.unitframes.custompbgcolor
