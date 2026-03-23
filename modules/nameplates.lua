@@ -574,8 +574,13 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
   end)
 
   nameplates:SetScript("OnUpdate", function()
+    -- PERF: Throttle central OnUpdate to ~100 FPS (0.01s)
+    local now = GetTime()
+    if (this.frameTick or 0) + 0.01 > now then return end
+    this.frameTick = now
+
     -- PERF: Cache GetTime() once per frame
-    frameState.now = GetTime()
+    frameState.now = now
     frameState.hasTarget, frameState.targetGuid = UnitExists("target")
     frameState.hasMouseover = UnitExists("mouseover")
 
@@ -1279,17 +1284,24 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     local isCasting = nameplate.castbar and nameplate.castbar:IsShown()
     
     local throttle
-    if target or isCasting then
+    if target then
       throttle = pfUI.throttle:Get("nameplates_target")  -- Default: 50 FPS
     elseif visiblePlateCount > 20 then
       throttle = pfUI.throttle:Get("nameplates_mass")    -- Default: 7 FPS for mass pulls
     else
       throttle = pfUI.throttle:Get("nameplates")         -- Default: 10 FPS
     end
-    
+
+    -- When a castbar is actively shown, use the castbar throttle if it's faster
+    -- than the general throttle, so the castbar animation stays smooth
+    local castbarThrottle = pfUI.throttle:Get("nameplates_castbar")
+    if isCasting and castbarThrottle < throttle then
+      throttle = castbarThrottle
+    end
+
     -- Check for pending event updates (these bypass throttle for immediate response)
     local hasEventUpdate = nameplate.eventcache or nameplate.auraUpdate or nameplate.castUpdate or nameplate.targetUpdate or nameplate.comboUpdate
-    
+
     -- Event updates bypass throttle
     if not hasEventUpdate and (nameplate.lasttick or 0) + throttle > now then return end
     nameplate.lasttick = now
@@ -1567,8 +1579,17 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
         local channel, cast, nameSubtext, text, texture, startTime, endTime, isTradeSkill
 
         if targetGUID then
-          -- We have a GUID = Nampower is authority, no cast means no cast
-          nameplate.castbar:Hide()
+          -- We have a GUID but Nampower has no cast info.
+          -- Fall back to API for the target plate (channels may not be in cast cache)
+          if isTargetPlate and UnitExists("target") then
+            cast, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo("target")
+            if not cast then
+              channel, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo("target")
+            end
+          end
+          if not cast and not channel then
+            nameplate.castbar:Hide()
+          end
         elseif isTargetPlate and UnitExists("target") then
           cast, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo("target")
           if not cast then
