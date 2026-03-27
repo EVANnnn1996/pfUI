@@ -200,10 +200,10 @@ pfUI:RegisterModule("thirdparty-vanilla", "vanilla", function()
 
       if C.thirdparty.chatbg == "1" and C.chat.global.custombg == "1" then
         local r, g, b, a = strsplit(",", C.chat.global.background)
-        TWTMain.backdrop:SetBackdropColor(tonumber(r), tonumber(g), tonumber(b), tonumber(a))
+        TWTMain.backdrop:SetBackdropColor(tonumber(r), tonumber(g), tonumber(b), 0)
 
         local r, g, b, a = strsplit(",", C.chat.global.border)
-        TWTMain.backdrop:SetBackdropBorderColor(tonumber(r), tonumber(g), tonumber(b), tonumber(a))
+        TWTMain.backdrop:SetBackdropBorderColor(tonumber(r), tonumber(g), tonumber(b), 0)
       end
 
       TWTMainTitleBG:Hide()

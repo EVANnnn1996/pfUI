@@ -300,10 +300,10 @@ pfUI:RegisterModule("thirdparty", "vanilla:tbc", function()
 
             if C.thirdparty.chatbg == "1" and C.chat.global.custombg == "1" then
               local r, g, b, a = strsplit(",", C.chat.global.background)
-              window.backdrop:SetBackdropColor(tonumber(r), tonumber(g), tonumber(b), tonumber(a))
+              window.backdrop:SetBackdropColor(tonumber(r), tonumber(g), tonumber(b), 0)
 
               local r, g, b, a = strsplit(",", C.chat.global.border)
-              window.backdrop:SetBackdropBorderColor(tonumber(r), tonumber(g), tonumber(b), tonumber(a))
+              window.backdrop:SetBackdropBorderColor(tonumber(r), tonumber(g), tonumber(b), 0)
             end
 
             -- skin buttons
@@ -317,7 +317,7 @@ pfUI:RegisterModule("thirdparty", "vanilla:tbc", function()
               if button then
                 button:SetHeight(14)
                 CreateBackdrop(button, -1, true, .75)
-                button:SetBackdropBorderColor(.4,.4,.4,1)
+                button:SetBackdropBorderColor(.4,.4,.4,0)
 
                 if button:GetWidth() == 16 then
                   button:SetWidth(14)
