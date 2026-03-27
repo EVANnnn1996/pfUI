@@ -2419,11 +2419,6 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
           CreateConfig(nil, T["Use Custom Spell Power Color (unchecked = biggest school color)"], C.unitframes[c], "display_sp_color_override", "checkbox")
           CreateConfig(nil, T["Spell Power Color"], C.unitframes[c], "display_sp_color", "color")
         end
-
-        if c == "target" then
-          CreateConfig(U[c], T["Target Stats Display"], nil, nil, "header")
-          CreateConfig(U[c], T["Display Target Armor"], C.unitframes[c], "display_armor", "checkbox")
-        end
       end)
     end
 

@@ -322,7 +322,6 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("unitframes", "player",      "display_spellpower",      "1")
   pfUI:UpdateConfig("unitframes", "player",      "display_sp_color_override", "0")
   pfUI:UpdateConfig("unitframes", "player",      "display_sp_color",        "")
-  pfUI:UpdateConfig("unitframes", "target",      "display_armor",           "0")
 
   pfUI:UpdateConfig("unitframes", "focus",       "width",            "120")
   pfUI:UpdateConfig("unitframes", "focus",       "height",           "34")
