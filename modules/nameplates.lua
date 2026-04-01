@@ -327,28 +327,39 @@ pfUI:RegisterModule("nameplates", "vanilla", function ()
 
   local function PlateCacheDebuffs(self, unitstr, verify)
     if not self.debuffcache then self.debuffcache = {} end
-    if not libdebuff then return end  -- Safety check
+    if not libdebuff then return end
 
+    local now = GetTime()
+
+    -- Clear existing cache slots
     for id = 1, 16 do
-      local effect, _, texture, stacks, _, duration, timeleft
-
-      if unitstr and C.nameplates.selfdebuff == "1" then
-        effect, _, texture, stacks, _, duration, timeleft = libdebuff:UnitOwnDebuff(unitstr, id)
-      else
-        effect, _, texture, stacks, _, duration, timeleft = libdebuff:UnitDebuff(unitstr, id)
+      if self.debuffcache[id] then
+        self.debuffcache[id].empty = true
       end
+    end
 
-      if effect and timeleft and timeleft > 0 then
-        local start = GetTime() - ( (duration or 0) - ( timeleft or 0) )
-        local stop = GetTime() + ( timeleft or 0 )
-        self.debuffcache[id] = self.debuffcache[id] or {}
-        self.debuffcache[id].effect = effect
-        self.debuffcache[id].texture = texture
-        self.debuffcache[id].stacks = stacks
-        self.debuffcache[id].duration = duration or 0
-        self.debuffcache[id].start = start
-        self.debuffcache[id].stop = stop
-        self.debuffcache[id].empty = nil
+    -- Get GUID - unitstr may already be a GUID from plate.parent:GetName(1)
+    local guid = unitstr
+    if unitstr and not string.find(unitstr, "^0x") and GetUnitGUID then
+      guid = GetUnitGUID(unitstr) or unitstr
+    end
+
+    if guid then
+      for id = 1, 16 do
+        local effect, _, texture, stacks, dtype, duration, timeleft
+        effect, _, texture, stacks, dtype, duration, timeleft = libdebuff:UnitDebuff(guid, id)
+        if effect and texture then
+          local stop = (timeleft and timeleft > 0) and (now + timeleft) or nil
+          local start = stop and (stop - (duration or 0)) or now
+          self.debuffcache[id] = self.debuffcache[id] or {}
+          self.debuffcache[id].effect = effect
+          self.debuffcache[id].texture = texture
+          self.debuffcache[id].stacks = stacks
+          self.debuffcache[id].duration = duration or 0
+          self.debuffcache[id].start = start
+          self.debuffcache[id].stop = stop
+          self.debuffcache[id].empty = nil
+        end
       end
     end
 
@@ -359,15 +370,15 @@ pfUI:RegisterModule("nameplates", "vanilla", function ()
     -- break on unknown data
     if not self.debuffcache then return end
     if not self.debuffcache[id] then return end
-    if not self.debuffcache[id].stop then return end
 
     -- break on timeout debuffs
     if self.debuffcache[id].empty then return end
-    if self.debuffcache[id].stop < GetTime() then return end
+    if self.debuffcache[id].stop and self.debuffcache[id].stop < GetTime() then return end
 
     -- return cached debuff
     local c = self.debuffcache[id]
-    return c.effect, c.rank, c.texture, c.stacks, c.dtype, c.duration, (c.stop - GetTime())
+    local timeleft = c.stop and (c.stop - GetTime()) or -1
+    return c.effect, c.rank, c.texture, c.stacks, c.dtype, c.duration, timeleft
   end
 
   local function CreateDebuffIcon(plate, index)
@@ -751,9 +762,11 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     nameplate.level = nameplate:CreateFontString(nil, "OVERLAY")
     nameplate.level:SetPoint("RIGHT", nameplate.health, "LEFT", -3, 0)
 
-    nameplate.raidicon:SetParent(plate)
-    nameplate.raidicon:SetDrawLayer("OVERLAY")
-    nameplate.raidicon:SetTexture(pfUI.media["img:raidicons"])
+    nameplate.raidicon:SetParent(nameplate.health)
+    nameplate.raidicon:SetDrawLayer("OVERLAY", 7)
+    if C.unitframes.blizzard_raidicons ~= "1" then
+      nameplate.raidicon:SetTexture(pfUI.media["img:raidicons"])
+    end
 
     nameplate.totem = CreateFrame("Frame", nil, nameplate)
     nameplate.totem:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
@@ -893,7 +906,7 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     nameplate.glow:SetVertexColor(glowr, glowg, glowb, glowa)
 
     nameplate.raidicon:ClearAllPoints()
-    nameplate.raidicon:SetPoint(C.nameplates.raidiconpos, nameplate.health, C.nameplates.raidiconpos, C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
+    nameplate.raidicon:SetPoint("BOTTOM", nameplate.health, "TOP", C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
     nameplate.level:SetFont(font, font_size, font_style)
     nameplate.raidicon:SetWidth(C.nameplates.raidiconsize)
     nameplate.raidicon:SetHeight(C.nameplates.raidiconsize)
@@ -992,8 +1005,8 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     -- yet updated. So while being inside this event, we cannot trust the unitstr.
     if event == "PLAYER_TARGET_CHANGED" then unitstr = nil end
 
-    -- remove unitstr on unit name mismatch
-    if unitstr and UnitName(unitstr) ~= name then unitstr = nil end
+    -- remove unitstr on unit name mismatch (skip for GUIDs - they're always valid)
+    if unitstr and not string.find(unitstr, "^0x") and UnitName(unitstr) ~= name then unitstr = nil end
 
     -- use mobhealth values if addon is running
     if (MobHealth3 or MobHealthFrame) and target and name == UnitName('target') and MobHealth_GetTargetCurHP() then
@@ -1191,13 +1204,11 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
         plate:CacheDebuffs(unitstr, verify)
       end
 
-      -- update all debuff icons
+      -- update all debuff icons - use direct UnitDebuff when unitstr available
       for i = 1, 16 do
         local effect, rank, texture, stacks, dtype, duration, timeleft
 
-        if unitstr and C.nameplates.selfdebuff == "1" and libdebuff then
-          effect, rank, texture, stacks, dtype, duration, timeleft = libdebuff:UnitOwnDebuff(unitstr, i)
-        elseif unitstr and libdebuff then
+        if unitstr and libdebuff then
           effect, rank, texture, stacks, dtype, duration, timeleft = libdebuff:UnitDebuff(unitstr, i)
         elseif plate.verify == verify then
           effect, rank, texture, stacks, dtype, duration, timeleft = plate:UnitDebuff(i)
@@ -1220,11 +1231,17 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
             plate.debuffs[index].stacks:Hide()
           end
 
-          if duration and timeleft and cfg.debufftimers then
+          if duration and timeleft and timeleft >= 0 and cfg.debufftimers then
             -- PERF: Only update cooldown if start time changed significantly
             local cd = plate.debuffs[index].cd
             local newStart = GetTime() + timeleft - duration
-            
+
+            -- Reset cachedStart if the debuff in this slot changed (slots shift when one expires)
+            if cd.cachedEffect ~= effect then
+              cd.cachedEffect = effect
+              cd.cachedStart = nil
+            end
+
             if not cd.cachedStart or abs(cd.cachedStart - newStart) > 0.5 then
               -- Update config flags only on first run or config change
               if not cd.configCached or cd.cachedAnim ~= cfg.debuffanim or cd.cachedText ~= cfg.debufftext then
@@ -1251,6 +1268,9 @@ nameplates:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     for i = index, 16 do
       if plate.debuffs[i] then
         plate.debuffs[i]:Hide()
+        if plate.debuffs[i].cd then
+          plate.debuffs[i].cd.cachedStart = nil
+        end
       end
     end
   end
