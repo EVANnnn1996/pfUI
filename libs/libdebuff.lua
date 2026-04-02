@@ -200,6 +200,11 @@ pfUI.libdebuff_unit_died_hooks = pfUI.libdebuff_unit_died_hooks or {}
 
 -- Callbacks fired after SPELL_CAST_EVENT is processed: fn(success, spellId, castType, targetGuid)
 pfUI.libdebuff_spell_cast_hooks = pfUI.libdebuff_spell_cast_hooks or {}
+
+-- Callbacks fired when a cast is identified as a downrank of an already active debuff.
+-- fn(spellName, castRank, activeRank, targetGuid, casterGuid)
+-- External addons can use this to avoid re-implementing downrank detection themselves.
+pfUI.libdebuff_downrank_blocked_hooks = pfUI.libdebuff_downrank_blocked_hooks or {}
 local AURA_CAST_DEDUPE_WINDOW = 0.1  -- Ignore duplicates within 100ms
 
 -- Captured combo points from SPELL_CAST_EVENT (before client consumes them)
@@ -1341,13 +1346,33 @@ if hasNampower then
         castRank = tonumber((string.gsub(spellRankString, "Rank ", ""))) or 0
       end
       
-      -- Store in pendingCasts for DEBUFF_ADDED correlation
+      -- Store in pendingCasts for DEBUFF_ADDED correlation.
+      -- If this cast is a downrank of an already active debuff, fire the downrank blocked hook
+      -- so external addons (e.g. SuperCleveRoidMacros) don't need to re-implement this check.
       if targetGuid then
         pendingCasts[targetGuid] = pendingCasts[targetGuid] or {}
+        local isDownrankBlocked = false
+        if castRank > 0 then
+          local existingOwn = ownDebuffs[targetGuid] and ownDebuffs[targetGuid][spellName]
+          if existingOwn and existingOwn.rank and existingOwn.rank > castRank then
+            local existingTimeleft = (existingOwn.startTime + existingOwn.duration) - GetTime()
+            if existingTimeleft > 0 then
+              isDownrankBlocked = true
+              -- Fire hook so external addons know this cast was downrank-blocked
+              if pfUI.libdebuff_downrank_blocked_hooks then
+                for _, fn in pairs(pfUI.libdebuff_downrank_blocked_hooks) do
+                  fn(spellName, castRank, existingOwn.rank, targetGuid, casterGuid)
+                end
+              end
+            end
+          end
+        end
+        -- Always write pendingCasts — let consumers use the hook to handle downrank themselves
         pendingCasts[targetGuid][spellName] = {
           casterGuid = casterGuid,
           rank = castRank,
-          time = GetTime()
+          time = GetTime(),
+          downrankBlocked = isDownrankBlocked
         }
       end
 
