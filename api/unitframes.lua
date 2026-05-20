@@ -834,43 +834,56 @@ function pfUI.uf:UpdateConfig()
     f:UnregisterEvent("UNIT_COMBAT")
   end
 
+  local hpLeftFontSize = tonumber(f.config.txthpleftsize or "") or fontsize
+  if hpLeftFontSize <= 0 then hpLeftFontSize = fontsize end
+  local hpCenterFontSize = tonumber(f.config.txthpcentersize or "") or fontsize
+  if hpCenterFontSize <= 0 then hpCenterFontSize = fontsize end
+  local hpRightFontSize = tonumber(f.config.txthprightsize or "") or fontsize
+  if hpRightFontSize <= 0 then hpRightFontSize = fontsize end
+  local powerLeftFontSize = tonumber(f.config.txtpowerleftsize or "") or fontsize
+  if powerLeftFontSize <= 0 then powerLeftFontSize = fontsize end
+  local powerCenterFontSize = tonumber(f.config.txtpowercentersize or "") or fontsize
+  if powerCenterFontSize <= 0 then powerCenterFontSize = fontsize end
+  local powerRightFontSize = tonumber(f.config.txtpowerrightsize or "") or fontsize
+  if powerRightFontSize <= 0 then powerRightFontSize = fontsize end
+
   f.hpLeftText:SetFontObject(GameFontWhite)
-  f.hpLeftText:SetFont(fontname, fontsize, fontstyle)
+  f.hpLeftText:SetFont(fontname, hpLeftFontSize, fontstyle)
   f.hpLeftText:SetJustifyH("LEFT")
   f.hpLeftText:ClearAllPoints()
   f.hpLeftText:SetPoint("TOPLEFT",f.hp.bar, "TOPLEFT", 2*(default_border + f.config.txthpleftoffx), 1 + tonumber(f.config.txthpleftoffy))
   f.hpLeftText:SetPoint("BOTTOMRIGHT",f.hp.bar, "BOTTOMRIGHT", -2*(default_border + f.config.txthpleftoffx), f.config.txthpleftoffy)
 
   f.hpRightText:SetFontObject(GameFontWhite)
-  f.hpRightText:SetFont(fontname, fontsize, fontstyle)
+  f.hpRightText:SetFont(fontname, hpRightFontSize, fontstyle)
   f.hpRightText:SetJustifyH("RIGHT")
   f.hpRightText:ClearAllPoints()
   f.hpRightText:SetPoint("TOPLEFT",f.hp.bar, "TOPLEFT", 2*(default_border + f.config.txthprightoffx), 1 + tonumber(f.config.txthprightoffy))
   f.hpRightText:SetPoint("BOTTOMRIGHT",f.hp.bar, "BOTTOMRIGHT", -2*(default_border + f.config.txthprightoffx), f.config.txthprightoffy)
 
   f.hpCenterText:SetFontObject(GameFontWhite)
-  f.hpCenterText:SetFont(fontname, fontsize, fontstyle)
+  f.hpCenterText:SetFont(fontname, hpCenterFontSize, fontstyle)
   f.hpCenterText:SetJustifyH("CENTER")
   f.hpCenterText:ClearAllPoints()
   f.hpCenterText:SetPoint("TOPLEFT",f.hp.bar, "TOPLEFT", f.config.txthpcenteroffx, 1 + tonumber(f.config.txthpcenteroffy))
   f.hpCenterText:SetPoint("BOTTOMRIGHT",f.hp.bar, "BOTTOMRIGHT", f.config.txthpcenteroffx, f.config.txthpcenteroffy)
 
   f.powerLeftText:SetFontObject(GameFontWhite)
-  f.powerLeftText:SetFont(fontname, fontsize, fontstyle)
+  f.powerLeftText:SetFont(fontname, powerLeftFontSize, fontstyle)
   f.powerLeftText:SetJustifyH("LEFT")
   f.powerLeftText:ClearAllPoints()
   f.powerLeftText:SetPoint("TOPLEFT",f.power.bar, "TOPLEFT", 2*(default_border + f.config.txtpowerleftoffx), 1 + tonumber(f.config.txtpowerleftoffy))
   f.powerLeftText:SetPoint("BOTTOMRIGHT",f.power.bar, "BOTTOMRIGHT", -2*(default_border + f.config.txtpowerleftoffx), f.config.txtpowerleftoffy)
 
   f.powerRightText:SetFontObject(GameFontWhite)
-  f.powerRightText:SetFont(fontname, fontsize, fontstyle)
+  f.powerRightText:SetFont(fontname, powerRightFontSize, fontstyle)
   f.powerRightText:SetJustifyH("RIGHT")
   f.powerRightText:ClearAllPoints()
   f.powerRightText:SetPoint("TOPLEFT",f.power.bar, "TOPLEFT", 2*(default_border + f.config.txtpowerrightoffx), 1 + tonumber(f.config.txtpowerrightoffy))
   f.powerRightText:SetPoint("BOTTOMRIGHT",f.power.bar, "BOTTOMRIGHT", -2*(default_border + f.config.txtpowerrightoffx), f.config.txtpowerrightoffy)
 
   f.powerCenterText:SetFontObject(GameFontWhite)
-  f.powerCenterText:SetFont(fontname, fontsize, fontstyle)
+  f.powerCenterText:SetFont(fontname, powerCenterFontSize, fontstyle)
   f.powerCenterText:SetJustifyH("CENTER")
   f.powerCenterText:ClearAllPoints()
   f.powerCenterText:SetPoint("TOPLEFT",f.power.bar, "TOPLEFT", f.config.txtpowercenteroffx, 1 + tonumber(f.config.txtpowercenteroffy))
