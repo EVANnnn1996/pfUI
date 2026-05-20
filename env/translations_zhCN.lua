@@ -35,6 +35,7 @@ pfUI_translation["zhCN"] = {
   ["A new version is available"] = "发现新版本!",
   ["Appearance"] = "外观设置",
   ["Ascending"] = "上移",
+  ["Aspect Ratio"] = "长宽比",
   ["Author"] = "作者",
   ["Auto-Castable Action Indicator"] = "自动施放(宠物)技能指示器",
   ["Auto Hide"] = "自动隐藏",

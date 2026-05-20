@@ -35,6 +35,7 @@ pfUI_translation["frFR"] = {
   ["A new version is available"] = "Une nouvelle version est disponible",
   ["Appearance"] = "Apparence",
   ["Ascending"] = "Ascendante",
+  ["Aspect Ratio"] = nil,
   ["Author"] = "Auteur",
   ["Auto-Castable Action Indicator"] = "Indicateur d'action de lancer de sort automatique",
   ["Auto Hide"] = "Cacher Automatiquement",

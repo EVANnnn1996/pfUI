@@ -1277,12 +1277,17 @@ end
 -- 'barsize'    integer number of buttons,
 -- 'formfactor' string formfactor in cols x rows,
 -- 'padding'    the spacing between buttons
-function pfUI.api.BarLayoutSize(bar,barsize,formfactor,iconsize,bordersize,padding,uneven,fillmode)
+-- 'aspect'     button aspect ratio (width / height), default 1
+function pfUI.api.BarLayoutSize(bar,barsize,formfactor,iconsize,bordersize,padding,uneven,fillmode,aspect)
   assert(barsize > 0 and barsize <= NUM_ACTIONBAR_BUTTONS,"BarLayoutSize: barsize "..tostring(barsize).." is invalid")
   local cols, rows = ResolveBarLayout(barsize, formfactor, uneven)
   if not cols or not rows then cols, rows = unpack(pfGridmath[barsize][1]) end
-  local width = (iconsize + bordersize*2+padding) * cols + padding
-  local height = (iconsize + bordersize*2+padding) * rows + padding
+  aspect = tonumber(aspect) or 1
+  if aspect <= 0 then aspect = 1 end
+  local iconwidth = iconsize * aspect
+  local iconheight = iconsize
+  local width = (iconwidth + bordersize*2+padding) * cols + padding
+  local height = (iconheight + bordersize*2+padding) * rows + padding
   bar._size = {width,height}
   return bar._size
 end
@@ -1295,7 +1300,8 @@ end
 -- 'iconsize'     size of the button
 -- 'bordersize'   default bordersize
 -- 'padding'      the spacing between buttons
-function pfUI.api.BarButtonAnchor(button,basename,buttonindex,barsize,formfactor,iconsize,bordersize,padding,uneven,fillmode)
+-- 'aspect'       button aspect ratio (width / height), default 1
+function pfUI.api.BarButtonAnchor(button,basename,buttonindex,barsize,formfactor,iconsize,bordersize,padding,uneven,fillmode,aspect)
   assert(barsize > 0 and barsize <= NUM_ACTIONBAR_BUTTONS,"BarButtonAnchor: barsize "..tostring(barsize).." is invalid")
   local cols, rows, mode, orientation = ResolveBarLayout(barsize, formfactor, uneven)
   if not cols or not rows then
@@ -1334,7 +1340,10 @@ function pfUI.api.BarButtonAnchor(button,basename,buttonindex,barsize,formfactor
   end
 
   local parent = button:GetParent()
-  local step = iconsize + bordersize*2 + padding
+  aspect = tonumber(aspect) or 1
+  if aspect <= 0 then aspect = 1 end
+  local stepx = iconsize * aspect + bordersize*2 + padding
+  local stepy = iconsize + bordersize*2 + padding
   local row, col
   if mode == "cols" then
     col = math.ceil(slotindex / rows)
@@ -1356,8 +1365,8 @@ function pfUI.api.BarButtonAnchor(button,basename,buttonindex,barsize,formfactor
       if row == final_row then row = 1 else row = row + 1 end
     end
   end
-  local x = bordersize + padding + (col - 1) * step
-  local y = -bordersize - padding - (row - 1) * step
+  local x = bordersize + padding + (col - 1) * stepx
+  local y = -bordersize - padding - (row - 1) * stepy
   if slotindex == 1 then
     button._anchor = {"TOPLEFT", parent, "TOPLEFT", x, y}
   else
@@ -1367,14 +1376,14 @@ function pfUI.api.BarButtonAnchor(button,basename,buttonindex,barsize,formfactor
       local count = barsize - (final_col - 1) * rows
       local target_col = (orientation == "LEFT") and 1 or cols
       if count > 0 and count < rows and col == target_col and row == 1 then
-        button._anchor[5] = button._anchor[5] - (rows - count) * step / 2
+        button._anchor[5] = button._anchor[5] - (rows - count) * stepy / 2
       end
     else
       local final_row = math.ceil(barsize / cols)
       local count = barsize - (final_row - 1) * cols
       local target_row = (orientation == "UP") and 1 or rows
       if count > 0 and count < cols and row == target_row and col == 1 then
-        button._anchor[4] = button._anchor[4] + (cols - count) * step / 2
+        button._anchor[4] = button._anchor[4] + (cols - count) * stepx / 2
       end
     end
   end

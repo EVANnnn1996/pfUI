@@ -35,6 +35,7 @@ pfUI_translation["zhTW"] = {
   ["A new version is available"] = nil,
   ["Appearance"] = "外觀設置",
   ["Ascending"] = "下移",
+  ["Aspect Ratio"] = nil,
   ["Author"] = nil,
   ["Auto-Castable Action Indicator"] = nil,
   ["Auto Hide"] = nil,

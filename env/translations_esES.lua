@@ -35,6 +35,7 @@ pfUI_translation["esES"] = {
   ["A new version is available"] = "Una nueva versión está disponible",
   ["Appearance"] = "Apariencia",
   ["Ascending"] = "Ascendiendo",
+  ["Aspect Ratio"] = nil,
   ["Author"] = "Autor",
   ["Auto-Castable Action Indicator"] = "Indicador de acción autolanzable",
   ["Auto Hide"] = "Ocultar automáticamente",

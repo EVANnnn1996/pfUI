@@ -35,6 +35,7 @@ pfUI_translation["ruRU"] = {
   ["A new version is available"] = "Доступна новая версия",
   ["Appearance"] = "Внешний вид",
   ["Ascending"] = "По возрастанию",
+  ["Aspect Ratio"] = nil,
   ["Author"] = "Автор",
   ["Auto-Castable Action Indicator"] = "Индикатор автоматически произносимых заклинаний",
   ["Auto Hide"] = "Автоматическое скрытие",

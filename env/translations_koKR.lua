@@ -35,6 +35,7 @@ pfUI_translation["koKR"] = {
   ["A new version is available"] = nil,
   ["Appearance"] = "외관 설정",
   ["Ascending"] = nil,
+  ["Aspect Ratio"] = nil,
   ["Author"] = nil,
   ["Auto-Castable Action Indicator"] = nil,
   ["Auto Hide"] = nil,

@@ -1075,6 +1075,8 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
   local function CreateActionButton(parent, bar, button)
     -- load config
     local size = C.bars["bar"..bar].icon_size
+    local aspect = tonumber(C.bars["bar"..bar].aspect_ratio) or 1
+    if aspect <= 0 then aspect = 1 end
     local font = pfUI.media[C.bars.font]
     local font_offset = tonumber(C.bars.font_offset)
 
@@ -1262,7 +1264,7 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     -- general appearance
     f.showempty = showempty == "1" and true or nil
     f:SetHeight(size)
-    f:SetWidth(size)
+    f:SetWidth(size * aspect)
     CreateBackdrop(f, border)
 
     return f
@@ -1273,6 +1275,8 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     local buttonbasename = "pfActionBar" .. barnames[i] .. "Button"
     local enable = C.bars["bar"..i].enable
     local size = C.bars["bar"..i].icon_size
+    local aspect = tonumber(C.bars["bar"..i].aspect_ratio) or 1
+    if aspect <= 0 then aspect = 1 end
     local spacing = C.bars["bar"..i].spacing
     local background = C.bars["bar"..i].background
     local formfactor = C.bars["bar"..i].formfactor
@@ -1422,7 +1426,7 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
       bars[i][j] = CreateActionButton(bars[i], i, j)
       bars[i][j].bar = i
 
-      BarButtonAnchor(bars[i][j], buttonbasename, j, buttons, formfactor, size, border, spacing, uneven, fillmode)
+      BarButtonAnchor(bars[i][j], buttonbasename, j, buttons, formfactor, size, border, spacing, uneven, fillmode, aspect)
       bars[i][j]:ClearAllPoints()
       bars[i][j]:SetPoint(unpack(bars[i][j]._anchor))
       bars[i][j]:Show()
@@ -1453,7 +1457,7 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     end
 
     -- adjust actionbar size
-    BarLayoutSize(bars[i], buttons, formfactor, size, border, spacing, uneven, fillmode)
+    BarLayoutSize(bars[i], buttons, formfactor, size, border, spacing, uneven, fillmode, aspect)
     bars[i]:SetWidth(bars[i]._size[1])
     bars[i]:SetHeight(bars[i]._size[2])
     bars[i]:ClearAllPoints()
@@ -1518,6 +1522,7 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
           and C.bars.bar1.background == "1" and C.bars.bar6.background == "1"
           and C.bars.bar1.autohide == "0" and C.bars.bar6.autohide == "0"
           and C.bars.bar1.icon_size == C.bars.bar6.icon_size
+          and (C.bars.bar1.aspect_ratio or "1") == (C.bars.bar6.aspect_ratio or "1")
           and C.bars.bar1.spacing == C.bars.bar6.spacing
           and C.bars.bar1.formfactor == C.bars.bar6.formfactor
           and C.bars.bar1.buttons == C.bars.bar6.buttons

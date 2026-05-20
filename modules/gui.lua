@@ -2656,6 +2656,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         end
 
         CreateConfig(U["bars"], T["Icon Size"], C.bars["bar"..id], "icon_size")
+        CreateConfig(U["bars"], T["Aspect Ratio"], C.bars["bar"..id], "aspect_ratio")
         CreateConfig(U["bars"], T["Spacing"], C.bars["bar"..id], "spacing", "dropdown", pfUI.gui.dropdowns.actionbarbuttons)
         local uneven_frame = nil
         local layout_ufunc = function()
