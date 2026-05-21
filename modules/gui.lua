@@ -188,7 +188,53 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       frame.config = config
 
       if widget == "color" then
-        -- color picker
+        -- color widget: swatch (opens native ColorPicker) + EditBox (RGB/HEX) + alpha EditBox
+        local function ParseColor(text)
+          if not text then return end
+          text = string.gsub(text, "%s", "")
+          -- HEX: #RRGGBB
+          local hex = string.match(text, "^#?(%x+)$")
+          if hex and string.len(hex) == 6 then
+            local r = tonumber(string.sub(hex, 1, 2), 16) / 255
+            local g = tonumber(string.sub(hex, 3, 4), 16) / 255
+            local b = tonumber(string.sub(hex, 5, 6), 16) / 255
+            return r, g, b
+          end
+          -- numeric: r,g,b; auto detect 0-1 vs 0-255
+          local pr, pg, pb = strsplit(",", text)
+          local r, g, b = tonumber(pr), tonumber(pg), tonumber(pb)
+          if not r or not g or not b then return end
+          if r > 1 or g > 1 or b > 1 then
+            r = r / 255
+            g = g / 255
+            b = b / 255
+          end
+          if r < 0 or r > 1 or g < 0 or g > 1 or b < 0 or b > 1 then return end
+          return r, g, b
+        end
+
+        local function ParseAlpha(text)
+          if not text then return end
+          text = string.gsub(text, "%s", "")
+          local a = tonumber(text)
+          if not a then return end
+          if a > 1 then a = a / 255 end
+          if a < 0 or a > 1 then return end
+          return a
+        end
+
+        local function FormatColor(r, g, b)
+          return string.format("#%02X%02X%02X",
+            math.floor(r * 255 + .5),
+            math.floor(g * 255 + .5),
+            math.floor(b * 255 + .5))
+        end
+
+        local function FormatAlpha(a)
+          return string.format("%.2f", a or 1)
+        end
+
+        -- color swatch (kept)
         frame.color = CreateFrame("Button", nil, frame)
         frame.color:SetWidth(24)
         frame.color:SetHeight(12)
@@ -197,11 +243,65 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         frame.color.prev = frame.color.backdrop:CreateTexture("OVERLAY")
         frame.color.prev:SetAllPoints(frame.color)
 
-        local cr, cg, cb, ca = strsplit(",", category[config])
-        if not cr or not cg or not cb or not ca then
-          cr, cg, cb, ca = 1, 1, 1, 1
+        -- alpha input (right of color, left of swatch)
+        frame.alpha = CreateFrame("EditBox", nil, frame)
+        CreateBackdrop(frame.alpha, nil, true)
+        frame.alpha:SetTextInsets(4, 4, 4, 4)
+        frame.alpha:SetTextColor(.2, 1, .8, 1)
+        frame.alpha:SetJustifyH("RIGHT")
+        frame.alpha:SetWidth(40)
+        frame.alpha:SetHeight(18)
+        frame.alpha:SetPoint("RIGHT", frame.color, "LEFT", -5, -1)
+        frame.alpha:SetFontObject(GameFontNormal)
+        frame.alpha:SetAutoFocus(false)
+
+        -- direct RGB/HEX input
+        frame.input = CreateFrame("EditBox", nil, frame)
+        CreateBackdrop(frame.input, nil, true)
+        frame.input:SetTextInsets(5, 5, 5, 5)
+        frame.input:SetTextColor(.2, 1, .8, 1)
+        frame.input:SetJustifyH("RIGHT")
+        frame.input:SetWidth(110)
+        frame.input:SetHeight(18)
+        frame.input:SetPoint("RIGHT", frame.alpha, "LEFT", -5, 0)
+        frame.input:SetFontObject(GameFontNormal)
+        frame.input:SetAutoFocus(false)
+
+        local function RefreshFromConfig()
+          local cr, cg, cb, ca = strsplit(",", category[config])
+          cr = tonumber(cr) or 1
+          cg = tonumber(cg) or 1
+          cb = tonumber(cb) or 1
+          ca = tonumber(ca) or 1
+          frame.color.prev:SetTexture(cr, cg, cb, ca)
+          frame.input:SetText(FormatColor(cr, cg, cb))
+          frame.input:SetTextColor(.2, 1, .8, 1)
+          frame.alpha:SetText(FormatAlpha(ca))
+          frame.alpha:SetTextColor(.2, 1, .8, 1)
         end
-        frame.color.prev:SetTexture(cr,cg,cb,ca)
+        RefreshFromConfig()
+
+        local function CommitColor()
+          local r, g, b = ParseColor(frame.input:GetText())
+          local a = ParseAlpha(frame.alpha:GetText())
+          if not r then frame.input:SetTextColor(1, .3, .3, 1) else frame.input:SetTextColor(.2, 1, .8, 1) end
+          if not a then frame.alpha:SetTextColor(1, .3, .3, 1) else frame.alpha:SetTextColor(.2, 1, .8, 1) end
+          if not r or not a then return end
+          local newval = r .. "," .. g .. "," .. b .. "," .. a
+          if category[config] ~= newval then
+            category[config] = newval
+            frame.color.prev:SetTexture(r, g, b, a)
+            if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+          end
+        end
+
+        frame.input:SetScript("OnEscapePressed", function() this:ClearFocus() end)
+        frame.input:SetScript("OnEnterPressed",  function() this:ClearFocus() end)
+        frame.input:SetScript("OnTextChanged", CommitColor)
+
+        frame.alpha:SetScript("OnEscapePressed", function() this:ClearFocus() end)
+        frame.alpha:SetScript("OnEnterPressed",  function() this:ClearFocus() end)
+        frame.alpha:SetScript("OnTextChanged", CommitColor)
 
         frame.color:SetScript("OnClick", function()
           local cr, cg, cb, ca = strsplit(",", category[config])
@@ -209,6 +309,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             cr, cg, cb, ca = 1, 1, 1, 1
           end
           local preview = this.prev
+          local editbox = frame.input
+          local alphabox = frame.alpha
 
           function ColorPickerFrame.func()
             local r, g, b = ColorPickerFrame:GetColorRGB()
@@ -223,12 +325,16 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
             if not this:GetParent():IsShown() then
               category[config] = r .. "," .. g .. "," .. b .. "," .. a
+              if editbox then editbox:SetText(FormatColor(r, g, b)) end
+              if alphabox then alphabox:SetText(FormatAlpha(a)) end
               if ufunc then ufunc() else pfUI.gui.settingChanged = true end
             end
           end
 
           function ColorPickerFrame.cancelFunc()
             preview:SetTexture(cr,cg,cb,ca)
+            if editbox then editbox:SetText(FormatColor(cr, cg, cb)) end
+            if alphabox then alphabox:SetText(FormatAlpha(ca)) end
           end
 
           ColorPickerFrame.opacityFunc = ColorPickerFrame.func
@@ -243,6 +349,12 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         -- hide shadows on wrong stratas
         if frame.color.backdrop_shadow then
           frame.color.backdrop_shadow:Hide()
+        end
+        if frame.input.backdrop_shadow then
+          frame.input.backdrop_shadow:Hide()
+        end
+        if frame.alpha.backdrop_shadow then
+          frame.alpha.backdrop_shadow:Hide()
         end
       end
 
