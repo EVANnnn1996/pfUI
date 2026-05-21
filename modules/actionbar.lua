@@ -1267,6 +1267,11 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     f:SetWidth(size * aspect)
     CreateBackdrop(f, border)
 
+    -- crop icon textures based on aspect to avoid stretching
+    local il, ir, it, ib = GetAspectTexCoord(aspect, .08, .92, .08, .92)
+    if f.icon then f.icon:SetTexCoord(il, ir, it, ib) end
+    if f.animation and f.animation.tex then f.animation.tex:SetTexCoord(il, ir, it, ib) end
+
     return f
   end
 

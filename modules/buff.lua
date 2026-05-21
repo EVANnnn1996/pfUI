@@ -396,6 +396,12 @@ pfUI:RegisterModule("buff", "vanilla:tbc", function ()
     buff:ClearAllPoints()
     buff:SetPoint("TOPRIGHT", relFrame, "TOPRIGHT",offsetX, offsetY)
 
+    -- crop buff texture based on aspect to avoid stretching
+    if buff.texture then
+      local l, r, t, b = GetAspectTexCoord(aspect, .07, .93, .07, .93)
+      buff.texture:SetTexCoord(l, r, t, b)
+    end
+
     buff.timer:SetFont(pfUI.font_default, fontsize, "OUTLINE")
     buff.stacks:SetFont(pfUI.font_default, fontsize+1, "OUTLINE")
 

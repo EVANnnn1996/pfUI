@@ -1272,6 +1272,36 @@ local function ResolveBarLayout(barsize, formfactor, uneven)
   return cols, rows, "rows", "DOWN"
 end
 
+-- [ Get Aspect Tex Coord ] --
+-- Computes texcoord values to crop a square texture into an aspect-shaped
+-- rectangle without stretching. Uses a base texcoord (left, right, top, bottom)
+-- to allow stacking on existing icon trim (e.g. .08/.92).
+-- 'aspect'     aspect ratio (width / height); default 1
+-- 'l, r, t, b' optional base texcoord (default 0,1,0,1)
+-- returns:     left, right, top, bottom suitable for SetTexCoord
+function pfUI.api.GetAspectTexCoord(aspect, l, r, t, b)
+  l = l or 0
+  r = r or 1
+  t = t or 0
+  b = b or 1
+  aspect = tonumber(aspect) or 1
+  if aspect <= 0 then aspect = 1 end
+  local w = r - l
+  local h = b - t
+  if aspect > 1 then
+    -- wider than tall: crop top/bottom
+    local trim = h * (1 - 1/aspect) / 2
+    t = t + trim
+    b = b - trim
+  elseif aspect < 1 then
+    -- taller than wide: crop left/right
+    local trim = w * (1 - aspect) / 2
+    l = l + trim
+    r = r - trim
+  end
+  return l, r, t, b
+end
+
 -- [ Bar Layout Size ] --
 -- 'bar'        frame reference,
 -- 'barsize'    integer number of buttons,
