@@ -999,8 +999,9 @@ end
 
     CreateBackdrop(nameplate.health, default_border)
 
-    nameplate.health.text:SetFont(font, font_size - 2, "OUTLINE")
-    nameplate.health.text:SetJustifyH(C.nameplates.hptextpos)
+    nameplate.health.text:SetFont(font, tonumber(C.nameplates.healthtext.fontsize) or (font_size - 2), "OUTLINE")
+    nameplate.health.text:ClearAllPoints()
+    nameplate.health.text:SetPoint("CENTER", nameplate.health, "CENTER", tonumber(C.nameplates.healthtext.offsetx) or 0, tonumber(C.nameplates.healthtext.offsety) or 0)
 
     nameplate.guild:SetFont(font, font_size, font_style)
 
@@ -1010,7 +1011,7 @@ end
 
     nameplate.raidicon:ClearAllPoints()
     nameplate.raidicon:SetPoint("BOTTOM", nameplate.health, "TOP", C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
-    nameplate.level:SetFont(font, font_size, font_style)
+    nameplate.level:SetFont(font, tonumber(C.nameplates.level.fontsize) or font_size, font_style)
     nameplate.raidicon:SetWidth(C.nameplates.raidiconsize)
     nameplate.raidicon:SetHeight(C.nameplates.raidiconsize)
 
@@ -1167,7 +1168,7 @@ end
       plate.guild:Hide()
       plate.totem:Show()
     elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
-      plate.level:SetPoint("RIGHT", plate.name, "LEFT", -3, 0)
+      plate.level:SetPoint("RIGHT", plate.name, "LEFT", tonumber(C.nameplates.level.offsetx) or -3, tonumber(C.nameplates.level.offsety) or 0)
       plate.name:SetParent(plate)
       plate.guild:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
 
@@ -1181,7 +1182,7 @@ end
       end
       plate.totem:Hide()
     else
-      plate.level:SetPoint("RIGHT", plate.health, "LEFT", -5, 0)
+      plate.level:SetPoint("RIGHT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or -5, tonumber(C.nameplates.level.offsety) or 0)
       plate.name:SetParent(plate.health)
       plate.guild:SetPoint("BOTTOM", plate.health, "BOTTOM", 0, -(font_size + 4))
 
@@ -1193,7 +1194,7 @@ end
     end
 
     plate.name:SetText(GetNameString(name))
-    plate.level:SetText(string.format("%s%s", level, (elitestrings[elite] or "")))
+    plate.level:SetText(string.format("Lv%s%s", level, (elitestrings[elite] or "")))
     
     -- Set level color from GetDifficultyColor when using DB level
     if levelFromDB and type(level) == "number" then
@@ -1246,7 +1247,7 @@ end
       local hasdata = ( rhp and rhpmax ) or estimated or hpmax > 100 or (round(hpmax/100*hp) ~= hp)
 
       if setting == "curperc" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s | %s%%", Abbreviate(rhp), ceil(hp/hpmax*100)))
+        plate.health.text:SetText(string.format("%s | %s", Abbreviate(rhp), ceil(hp/hpmax*100)))
       elseif setting == "cur" and hasdata and rhp then
         plate.health.text:SetText(string.format("%s", Abbreviate(rhp)))
       elseif setting == "curmax" and hasdata and rhp then
@@ -1254,13 +1255,13 @@ end
       elseif setting == "curmaxs" and hasdata and rhp then
         plate.health.text:SetText(string.format("%s / %s", Abbreviate(rhp), Abbreviate(rhpmax)))
       elseif setting == "curmaxperc" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s - %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
+        plate.health.text:SetText(string.format("%s - %s | %s", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
       elseif setting == "curmaxpercs" and hasdata and rhp then
-        plate.health.text:SetText(string.format("%s / %s | %s%%", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
+        plate.health.text:SetText(string.format("%s / %s | %s", Abbreviate(rhp), Abbreviate(rhpmax), ceil(hp/hpmax*100)))
       elseif setting == "deficit" and rhp then
         plate.health.text:SetText(string.format("-%s" .. (hasdata and "" or "%%"), Abbreviate(rhpmax - rhp)))
       else -- "percent" as fallback
-        plate.health.text:SetText(string.format("%s%%", ceil(hp/hpmax*100)))
+        plate.health.text:SetText(string.format("%s", ceil(hp/hpmax*100)))
       end
     else
       plate.health.text:SetText()
