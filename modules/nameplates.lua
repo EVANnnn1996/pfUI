@@ -972,7 +972,6 @@ end
 
     local width = tonumber(C.nameplates.width)
     local debuffsize = tonumber(C.nameplates.debuffsize)
-    local healthoffset = tonumber(C.nameplates.health.offset)
     local orientation = C.nameplates.verticalhealth == "1" and "VERTICAL" or "HORIZONTAL"
 
     local c = combatstate -- load combat state colors
@@ -991,7 +990,8 @@ end
     nameplate.name:SetFont(font, font_size, font_style)
 
     nameplate.health:SetOrientation(orientation)
-    nameplate.health:SetPoint("TOP", nameplate.name, "BOTTOM", 0, healthoffset)
+    nameplate.health:ClearAllPoints()
+    nameplate.health:SetPoint("TOP", nameplate, "TOP", 0, 0)
     nameplate.health:SetStatusBarTexture(hptexture)
     nameplate.health:SetWidth(C.nameplates.width)
     nameplate.health:SetHeight(C.nameplates.heighthealth)
@@ -1000,8 +1000,9 @@ end
     CreateBackdrop(nameplate.health, default_border)
 
     nameplate.health.text:SetFont(font, tonumber(C.nameplates.healthtext.fontsize) or (font_size - 2), "OUTLINE")
+    nameplate.health.text:SetJustifyH("RIGHT")
     nameplate.health.text:ClearAllPoints()
-    nameplate.health.text:SetPoint("CENTER", nameplate.health, "CENTER", tonumber(C.nameplates.healthtext.offsetx) or 0, tonumber(C.nameplates.healthtext.offsety) or 0)
+    nameplate.health.text:SetPoint("RIGHT", nameplate.health, "RIGHT", tonumber(C.nameplates.healthtext.offsetx) or -2, tonumber(C.nameplates.healthtext.offsety) or 0)
 
     nameplate.guild:SetFont(font, font_size, font_style)
 
@@ -1168,7 +1169,10 @@ end
       plate.guild:Hide()
       plate.totem:Show()
     elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
-      plate.level:SetPoint("RIGHT", plate.name, "LEFT", tonumber(C.nameplates.level.offsetx) or -3, tonumber(C.nameplates.level.offsety) or 0)
+      plate.level:ClearAllPoints()
+      plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
+      plate.name:ClearAllPoints()
+      plate.name:SetPoint("BOTTOM", plate.health, "TOP", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
       plate.name:SetParent(plate)
       plate.guild:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
 
@@ -1182,7 +1186,10 @@ end
       end
       plate.totem:Hide()
     else
-      plate.level:SetPoint("RIGHT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or -5, tonumber(C.nameplates.level.offsety) or 0)
+      plate.level:ClearAllPoints()
+      plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
+      plate.name:ClearAllPoints()
+      plate.name:SetPoint("BOTTOM", plate.health, "TOP", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
       plate.name:SetParent(plate.health)
       plate.guild:SetPoint("BOTTOM", plate.health, "BOTTOM", 0, -(font_size + 4))
 
