@@ -1172,7 +1172,8 @@ end
       plate.level:ClearAllPoints()
       plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
       plate.name:ClearAllPoints()
-      plate.name:SetPoint("BOTTOM", plate.health, "TOP", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
+      plate.name:SetJustifyH("LEFT")
+      plate.name:SetPoint("BOTTOMLEFT", plate.health, "TOPLEFT", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
       plate.name:SetParent(plate)
       plate.guild:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
 
@@ -1189,7 +1190,8 @@ end
       plate.level:ClearAllPoints()
       plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
       plate.name:ClearAllPoints()
-      plate.name:SetPoint("BOTTOM", plate.health, "TOP", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
+      plate.name:SetJustifyH("LEFT")
+      plate.name:SetPoint("BOTTOMLEFT", plate.health, "TOPLEFT", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
       plate.name:SetParent(plate.health)
       plate.guild:SetPoint("BOTTOM", plate.health, "BOTTOM", 0, -(font_size + 4))
 
