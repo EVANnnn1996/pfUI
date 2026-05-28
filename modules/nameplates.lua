@@ -1171,6 +1171,7 @@ end
     elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
       plate.level:ClearAllPoints()
       plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
+      plate.level:SetParent(plate)
       plate.name:ClearAllPoints()
       plate.name:SetJustifyH("LEFT")
       plate.name:SetPoint("BOTTOMLEFT", plate.health, "TOPLEFT", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
@@ -1189,6 +1190,7 @@ end
     else
       plate.level:ClearAllPoints()
       plate.level:SetPoint("LEFT", plate.health, "LEFT", tonumber(C.nameplates.level.offsetx) or 2, tonumber(C.nameplates.level.offsety) or 0)
+      plate.level:SetParent(plate.health)
       plate.name:ClearAllPoints()
       plate.name:SetJustifyH("LEFT")
       plate.name:SetPoint("BOTTOMLEFT", plate.health, "TOPLEFT", tonumber(C.nameplates.name.offsetx) or 0, tonumber(C.nameplates.name.offsety) or 2)
