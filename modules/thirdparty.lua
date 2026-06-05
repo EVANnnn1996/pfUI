@@ -241,13 +241,26 @@ pfUI:RegisterModule("thirdparty", "vanilla:tbc", function()
         ShaguDPSWindow:SetAllPoints(pfUI.chat.right)
         ShaguDPSWindow:SetWidth(pfUI.chat.right:GetWidth())
         if ShaguDPSWindow.Resize then ShaguDPSWindow:Resize() end
+
+        local sec = ShaguDPSWindow2 or (ShaguDPS.window and ShaguDPS.window[2])
+        if sec then
+          sec:ClearAllPoints()
+          sec:SetPoint("BOTTOMLEFT", ShaguDPSWindow, "TOPLEFT", 0, 0)
+          if sec.Resize then sec:Resize() end
+        end
       end,
       function() -- dual
         ShaguDPSWindow:ClearAllPoints()
-        ShaguDPSWindow:SetPoint("TOPLEFT", pfUI.chat.right, "TOP", 0, 0)
-        ShaguDPSWindow:SetPoint("BOTTOMRIGHT", pfUI.chat.right, "BOTTOMRIGHT", 0, 0)
+        ShaguDPSWindow:SetPoint("TOPRIGHT", pfUI.chat.right, "TOPRIGHT", 0, 5)
         ShaguDPSWindow:SetWidth(pfUI.chat.right:GetWidth() / 2)
         if ShaguDPSWindow.Resize then ShaguDPSWindow:Resize() end
+
+        local sec = ShaguDPSWindow2 or (ShaguDPS.window and ShaguDPS.window[2])
+        if sec then
+          sec:ClearAllPoints()
+          sec:SetPoint("BOTTOMLEFT", ShaguDPSWindow, "TOPLEFT", 0, 0)
+          if sec.Resize then sec:Resize() end
+        end
       end,
       function() -- show
         ShaguDPS.config.visible = 1
