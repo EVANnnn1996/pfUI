@@ -36,6 +36,12 @@ pfUI:RegisterModule("raid", "vanilla:tbc", function ()
 
       pfUI.uf.raid[i]:UpdateConfig()
       pfUI.uf.raid[i]:UpdateFrameSize()
+
+      local fname = pfUI.uf.raid[i]:GetName()
+      if fname and pfUI_config.position[fname] then
+        pfUI_config.position[fname] = nil
+      end
+      pfUI.uf.raid[i].posdata = nil
     end
 
     local i = 1
