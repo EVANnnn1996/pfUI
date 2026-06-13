@@ -163,7 +163,7 @@ pfUI:RegisterModule("thirdparty-vanilla", "vanilla", function()
     local docktable = { "twt", "TODO", "TWTMain",
       function() -- single
         TWTMain:ClearAllPoints()
-        TWTMain:SetPoint("TOPLEFT", pfUI.chat.right, "TOPLEFT", 0, 5.5)
+        TWTMain:SetPoint("TOPLEFT", pfUI.chat.right, "TOPLEFT", 0, 0)
         local width = pfUI.chat.right:GetWidth() - 3
         TWTMain:SetScale(width / TWTMain:GetWidth())
         TWTMainSettingsFrameHeightSlider:SetMinMaxValues(15, 30)
@@ -174,7 +174,7 @@ pfUI:RegisterModule("thirdparty-vanilla", "vanilla", function()
       end,
       function() -- dual
         TWTMain:ClearAllPoints()
-        TWTMain:SetPoint("TOPLEFT", pfUI.chat.right, "TOPLEFT", 0, 0)
+        TWTMain:SetPoint("TOPLEFT", pfUI.chat.right, "TOPLEFT", 0, 5.5)
         local width = (pfUI.chat.right:GetWidth() - 3) / 2
         TWTMain:SetScale(width / TWTMain:GetWidth())
         TWT_CONFIG.windowScale = width / TWTMain:GetWidth()
