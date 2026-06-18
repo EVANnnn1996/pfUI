@@ -86,10 +86,15 @@ pfUI:RegisterModule("mapcolors", function ()
   end
 
   local function ColorizeName(frame)
+    local name = UnitName(frame.unit)
+    if not name then return end
     local _, class = UnitClass(frame.unit)
-    local color = RAID_CLASS_COLORS[class]
-    frame.name = frame.name or UnitName(frame.unit)
-    frame.name = '|c'..color.colorStr..frame.name..'|r'
+    local color = class and RAID_CLASS_COLORS[class]
+    if color and color.colorStr then
+      frame.name = '|c'..color.colorStr..name..'|r'
+    else
+      frame.name = name
+    end
   end
 
   local function UpdateUnitColors(unit_button_name, tooltip)
