@@ -129,6 +129,7 @@ pfUI:RegisterModule("nameplates", "vanilla", function ()
     cfg.width = tonumber(C.nameplates.width) or 120
     cfg.heighthealth = tonumber(C.nameplates.heighthealth) or 8
     cfg.targetglow = C.nameplates.targetglow == "1"
+    cfg.targetarrow = C.nameplates.targetarrow == "1"
     cfg.targethighlight = C.nameplates.targethighlight == "1"
     cfg.outcombatstate = C.nameplates.outcombatstate == "1"
     cfg.barcombatstate = C.nameplates.barcombatstate == "1"
@@ -856,6 +857,20 @@ end
     nameplate.glow:SetTexture(pfUI.media["img:dot"])
     nameplate.glow:Hide()
 
+    nameplate.arrowleft = nameplate:CreateTexture(nil, "OVERLAY")
+    nameplate.arrowleft:SetTexture(pfUI.media["img:arrow_left"])
+    nameplate.arrowleft:SetPoint("RIGHT", nameplate.health, "LEFT", -4, 0)
+    nameplate.arrowleft:SetWidth(32)
+    nameplate.arrowleft:SetHeight(32)
+    nameplate.arrowleft:Hide()
+
+    nameplate.arrowright = nameplate:CreateTexture(nil, "OVERLAY")
+    nameplate.arrowright:SetTexture(pfUI.media["img:arrow_right"])
+    nameplate.arrowright:SetPoint("LEFT", nameplate.health, "RIGHT", 4, 0)
+    nameplate.arrowright:SetWidth(32)
+    nameplate.arrowright:SetHeight(32)
+    nameplate.arrowright:Hide()
+
     nameplate.guild = nameplate:CreateFontString(nil, "OVERLAY")
     nameplate.guild:SetPoint("BOTTOM", nameplate.health, "BOTTOM", 0, 0)
 
@@ -1131,6 +1146,14 @@ end
       plate.glow:Show() else plate.glow:Hide()
     end
 
+    if target and cfg.targetarrow then
+      plate.arrowleft:Show()
+      plate.arrowright:Show()
+    else
+      plate.arrowleft:Hide()
+      plate.arrowright:Hide()
+    end
+
     -- target indicator
     if cfg.outcombatstate then
       local guid = plate.parent:GetName(1) or ""
@@ -1163,6 +1186,8 @@ end
       plate.totem.icon:SetTexture("Interface\\Icons\\" .. TotemIcon)
 
       plate.glow:Hide()
+      plate.arrowleft:Hide()
+      plate.arrowright:Hide()
       plate.level:Hide()
       plate.name:Hide()
       plate.health:Hide()

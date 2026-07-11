@@ -713,6 +713,7 @@ pfUI_translation["zhCN"] = {
   ["Shift-Click to reset all money totals"] = "SHIFT点击重置所有金钱",
   ["Show Addon Buttons On Login"] = "登录时显示插件按钮",
   ["Show Animation On Hidden Bars"] = "在隐藏动作条上显示动画",
+  ["Show Arrows Beside Target Nameplate"] = "在目标姓名板两侧显示箭头",
   ["Show Background"] = "显示背景",
   ["Show Buff Indicators"] = "显示Buff指示器",
   ["Show Combat Text"] = "显示战斗信息",
