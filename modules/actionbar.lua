@@ -13,6 +13,7 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
   local eventcache = { } -- contains a list of events that shall be processed later -> [event] = true
   local updatecache = { } -- contains a list of buttons slots that shall be refreshed later -> [slot] = true
   local buttoncache = { } -- contains a list of all buttons ever created -> [slot] = frame
+  local IsTextInputActive
 
   local petvisibility = "[pet] show; hide"
 
@@ -322,6 +323,9 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     local self = self or this
     mouse = arg1 and not keystate
 
+    -- Override bindings click action buttons directly and bypass pfActionButton.
+    if keystate and IsTextInputActive and IsTextInputActive() then return end
+
     -- trigger action animation
     if ( pfUI_config.bars.keydown == "1" and keystate == "down" ) or (pfUI_config.bars.keydown == "0" and keystate == "up" ) or self.bar == 11 or mouse then
       if C.bars.animmode == "keypress" and ( self:GetAlpha() > .1  or C.bars.animalways == "1" ) then
@@ -347,6 +351,10 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     local slfcast = C.bars.altself == "1" and IsAltKeyDown() and true or self.slfcast
     slfcast = C.bars.rightself == "1" and arg1 and arg1 == "RightButton" and true or slfcast
     self.slfcast = nil
+
+    -- Keep keyboard bindings inactive while an editbox owns keyboard focus.
+    -- Mouse clicks remain available while typing, matching the default UI.
+    if keystate and IsTextInputActive and IsTextInputActive() then return end
 
     if ( pfUI_config.bars.keydown == "1" and keystate == "down" and not drag_active ) or (pfUI_config.bars.keydown == "0" and keystate == "up" or drag_active ) or self.bar == 11 or mouse then
       if self.bar == 11 then
@@ -1604,9 +1612,62 @@ pfUI:RegisterModule("actionbar", "vanilla", function ()
     end
   end
 
+  -- Track editboxes with keyboard focus. Vanilla doesn't provide a generic
+  -- keyboard focus getter, so keep the state via editbox focus handlers.
+  -- Rescan after addons load to include load-on-demand and third-party frames.
+  local focusedEditBox
+  local function EditBoxFocusGained(self)
+    focusedEditBox = self or this
+  end
+
+  local function EditBoxFocusLost(self)
+    local frame = self or this
+    if focusedEditBox == frame then focusedEditBox = nil end
+  end
+
+  local function ScanEditBoxes()
+    if not EnumerateFrames then return end
+
+    local frame = EnumerateFrames()
+    while frame do
+      if frame.GetObjectType and frame:GetObjectType() == "EditBox" and not frame.pfActionBarFocusHook then
+        frame.pfActionBarFocusHook = true
+        HookScript(frame, "OnEditFocusGained", EditBoxFocusGained)
+        HookScript(frame, "OnEditFocusLost", EditBoxFocusLost)
+
+        -- Newer clients can report an already focused editbox during a rescan.
+        if frame.HasFocus and frame:HasFocus() then focusedEditBox = frame end
+      end
+      frame = EnumerateFrames(frame)
+    end
+  end
+
+  local editBoxTracker = CreateFrame("Frame")
+  editBoxTracker:RegisterEvent("ADDON_LOADED")
+  editBoxTracker:RegisterEvent("PLAYER_ENTERING_WORLD")
+  editBoxTracker:SetScript("OnEvent", function()
+    -- Coalesce startup ADDON_LOADED events into a single scan on the next frame.
+    this:SetScript("OnUpdate", function()
+      ScanEditBoxes()
+      this:SetScript("OnUpdate", nil)
+    end)
+  end)
+  ScanEditBoxes()
+
+  IsTextInputActive = function()
+    -- Prefer the native API where available (TBC+ and enhanced clients).
+    if GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus() then return true end
+
+    -- IsVisible also protects against a stale reference after a parent is hidden.
+    if focusedEditBox and focusedEditBox:IsVisible() then return true end
+
+    -- Preserve the original chat safeguard if an editbox existed before scanning.
+    return ChatFrameEditBox and ChatFrameEditBox:IsVisible()
+  end
+
   -- Map Keybinds to button clicks
   function _G.pfActionButton(slot, slfcast, opt)
-    if ChatFrameEditBox:IsShown() then return end
+    if IsTextInputActive() then return end
 
     local bar, button = 1, slot
 
